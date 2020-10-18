@@ -1,8 +1,8 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @type/redis @type/express-session
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add nodemailer --no-optional
 
 PATH: 
-  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Yarn\bin\;%USERPROFILE%\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Vim\vim82;C:\Program Files\PostgreSQL\13\bin;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\DANIEL\AppData\Local\Microsoft\WindowsApps;C:\Users\DANIEL\AppData\Local\Yarn\bin;C:\Program Files\heroku\bin;C:\Users\DANIEL\AppData\Roaming\npm;C:\Program Files (x86)\Vim
+  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Yarn\bin\;C:\Users\DANIEL\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Vim\vim82;C:\Program Files\PostgreSQL\13\bin;C:\Program Files\Redis\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\DANIEL\AppData\Local\Microsoft\WindowsApps;C:\Users\DANIEL\AppData\Local\Yarn\bin;C:\Program Files\heroku\bin;C:\Users\DANIEL\AppData\Roaming\npm;C:\Program Files (x86)\Vim;C:\Program Files\PostgreSQL\13\bin;
 
 Yarn version: 
   1.22.4
@@ -14,17 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@type%2fredis: Not found
-      at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:66096:18)
-      at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:140748:22)
-      at Request.emit (events.js:314:20)
-      at Request.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:141720:10)
-      at Request.emit (events.js:314:20)
-      at IncomingMessage.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:141642:12)
-      at Object.onceWrapper (events.js:420:28)
-      at IncomingMessage.emit (events.js:326:22)
-      at endReadableNT (_stream_readable.js:1252:12)
-      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+  Error: EPERM: operation not permitted, unlink 'C:\Users\DANIEL\Documents\My Codes\Fullstack Projects\Node\denvato_reddit_clone\server\node_modules\argon2\lib\binding\napi-v3\argon2.node'
 
 npm manifest: 
   {
@@ -45,7 +35,9 @@ npm manifest:
     "license": "ISC",
     "devDependencies": {
       "@types/express": "^4.17.8",
+      "@types/express-session": "^1.17.0",
       "@types/node": "^14.11.8",
+      "@types/redis": "^2.8.28",
       "nodemon": "^2.0.4",
       "ts-node": "^9.0.0",
       "typescript": "^4.0.3"
@@ -55,6 +47,7 @@ npm manifest:
       "@mikro-orm/core": "^4.1.0",
       "@mikro-orm/migrations": "^4.1.0",
       "@mikro-orm/postgresql": "^4.1.0",
+      "@types/connect-redis": "^0.0.14",
       "@types/graphql": "^14.5.0",
       "apollo-server-express": "^2.18.2",
       "argon2": "^0.27.0",
@@ -300,6 +293,16 @@ Lockfile:
     dependencies:
       "@types/node" "*"
   
+  "@types/connect-redis@^0.0.14":
+    version "0.0.14"
+    resolved "https://registry.yarnpkg.com/@types/connect-redis/-/connect-redis-0.0.14.tgz#b4bc8e5510bdd9dfcc7b22bda527151f94cf52e5"
+    integrity sha512-snjiYYc1TUk4iJvwO41omcrZKBB0mdwMvl718m7zZj5Tz7qBqjTNS23KQdHF2QmJX/x40m1IH16R6GNLh2Et4Q==
+    dependencies:
+      "@types/express" "*"
+      "@types/express-session" "*"
+      "@types/ioredis" "*"
+      "@types/redis" "*"
+  
   "@types/connect@*":
     version "3.4.33"
     resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.33.tgz#31610c901eca573b8713c3330abc6e6b9f588546"
@@ -353,6 +356,14 @@ Lockfile:
       "@types/node" "*"
       "@types/qs" "*"
       "@types/range-parser" "*"
+  
+  "@types/express-session@*", "@types/express-session@^1.17.0":
+    version "1.17.0"
+    resolved "https://registry.yarnpkg.com/@types/express-session/-/express-session-1.17.0.tgz#770daf81368f6278e3e40dd894e1e52abbdca0cd"
+    integrity sha512-OQEHeBFE1UhChVIBhRh9qElHUvTp4BzKKHxMDkGHT7WuYk5eL93hPG7D8YAIkoBSbhNEY0RjreF15zn+U0eLjA==
+    dependencies:
+      "@types/express" "*"
+      "@types/node" "*"
   
   "@types/express@*", "@types/express@^4.17.8":
     version "4.17.8"
@@ -415,6 +426,13 @@ Lockfile:
     version "1.8.0"
     resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-1.8.0.tgz#682477dbbbd07cd032731cb3b0e7eaee3d026b69"
     integrity sha512-2aoSC4UUbHDj2uCsCxcG/vRMXey/m17bC7UwitVm5hn22nI8O8Y9iDpA76Orc+DWkQ4zZrOKEshCqR/jSuXAHA==
+  
+  "@types/ioredis@*":
+    version "4.17.5"
+    resolved "https://registry.yarnpkg.com/@types/ioredis/-/ioredis-4.17.5.tgz#9c8c6f08b98fd0f9e2dd40217434db607668ed21"
+    integrity sha512-MkG9WEGozGBDL869a0WJUBfDKodOFSfRfR4zSfq610MrdL9l+ToyHPyNqa4oSvAAAmldo06Gq1V+EzFRrNByfQ==
+    dependencies:
+      "@types/node" "*"
   
   "@types/json5@^0.0.29":
     version "0.0.29"
@@ -502,6 +520,13 @@ Lockfile:
     version "1.2.3"
     resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
     integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
+  
+  "@types/redis@*", "@types/redis@^2.8.28":
+    version "2.8.28"
+    resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.28.tgz#5862b2b64aa7f7cbc76dafd7e6f06992b52c55e3"
+    integrity sha512-8l2gr2OQ969ypa7hFOeKqtFoY70XkHxISV0pAwmQ2nm6CSPb1brmTmqJCGGrekCo+pAZyWlNXr+Kvo6L/1wijA==
+    dependencies:
+      "@types/node" "*"
   
   "@types/semver@^7.3.3":
     version "7.3.4"

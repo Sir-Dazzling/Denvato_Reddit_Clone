@@ -7,6 +7,8 @@ import { useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
 import { NavBar } from '../components/NavBar';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../utils/createUrqlClient';
 
 interface registerProps { }
 
@@ -51,7 +53,7 @@ const Register: React.FC<registerProps> = ({ }) =>
                             setErrorMessage("Oh dear, Something is wrong with your form 😩");
                         } else if (response.data?.register.user)
                         {
-                            router.push("/");
+                            await router.push("/");
                             showToast();
                         }
                     }}>
@@ -78,4 +80,4 @@ const Register: React.FC<registerProps> = ({ }) =>
     );
 }
 
-export default Register;
+export default withUrqlClient(createUrqlClient)(Register);

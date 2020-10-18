@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Button, Flex, Heading } from '@chakra-ui/core';
 import NextLink from 'next/link';
-import { useMeQuery } from '../generated/graphql';
+import { useLogoutMutation, useMeQuery } from '../generated/graphql';
+import { isServer } from '../utils/isServer';
 
 interface NavBarProps { }
 
@@ -9,9 +10,10 @@ export const NavBar: React.FC<NavBarProps> = ({ }) =>
 {
     const [show, setShow] = useState(false);
     const handleToggle = () => setShow(!show);
-    const [{ data, fetching }] = useMeQuery();
-
-    console.log(data?.me);
+    const [{ data, fetching }] = useMeQuery({
+        pause: isServer()
+    });
+    const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
 
     let body = null;
 
@@ -42,7 +44,17 @@ export const NavBar: React.FC<NavBarProps> = ({ }) =>
         body = (
             <Flex ml={"auto"}>
                 <Box>{data.me.username}</Box>
-                <Button variant="link" color="white" ml={"2"}>Logout</Button>
+                <Button
+                    variant="link"
+                    color="white"
+                    ml={"2"}
+                    onClick={() =>
+                    {
+                        logout();
+                    }}
+                    isLoading={logoutFetching}>
+                    Logout
+                </Button>
             </Flex>
         )
     }
@@ -62,18 +74,6 @@ export const NavBar: React.FC<NavBarProps> = ({ }) =>
                 </Heading>
             </Flex>
             {body}
-            <Box display={{ base: "block", md: "none" }} onClick={handleToggle}>
-                <svg
-                    fill="white"
-                    width="12px"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <title>Menu</title>
-                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-                </svg>
-
-            </Box>
         </Flex>
     );
 }

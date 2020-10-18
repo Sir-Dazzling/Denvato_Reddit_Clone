@@ -7,7 +7,7 @@ export class PostResolver
 {
     // Get all posts
     @Query(() => [Post])
-    posts(@Ctx() { em }: MyContext): Promise<Post[]>
+    async posts(@Ctx() { em }: MyContext): Promise<Post[]>
     {
         return em.find(Post, {});
     }

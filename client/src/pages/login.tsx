@@ -6,6 +6,8 @@ import { InputField } from '../components/InputField';
 import { useLoginMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
 import { NavBar } from '../components/NavBar';
+import { withUrqlClient } from 'next-urql';
+import { createUrqlClient } from '../utils/createUrqlClient';
 
 const Login: React.FC<{}> = ({ }) =>
 {
@@ -46,7 +48,7 @@ const Login: React.FC<{}> = ({ }) =>
                             // setErrors(toErrorMap(response.data.login.errors));
                         } else if (response.data?.login.user)
                         {
-                            router.push("/");
+                            await router.push("/");
                             showToast({ position: "bottom", title: "Login Success", description: "Welcome back, we missed you 🤗", status: "success" });
                         }
                     }}>
@@ -67,4 +69,4 @@ const Login: React.FC<{}> = ({ }) =>
     );
 }
 
-export default Login;
+export default withUrqlClient(createUrqlClient)(Login);

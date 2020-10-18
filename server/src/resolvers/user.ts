@@ -3,6 +3,7 @@ import { MyContext } from "src/types";
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import argon2 from 'argon2';
 import { EntityManager } from '@mikro-orm/postgresql';
+import { COOKIE_NAME } from "src/constants";
 
 @InputType()
 class UsernamePasswordInput
@@ -148,4 +149,19 @@ export class UserResolver
         return { user };
     }
 
+    // To logout a user
+    @Mutation(() => Boolean)
+    logout(@Ctx() { req, res }: MyContext)
+    {
+        return new Promise(resolve => req.session.destroy(error =>
+        {
+            res.clearCookie(COOKIE_NAME);
+            if (error)
+            {
+                console.error(error);
+                resolve(false);
+            }
+            resolve(true);
+        }));
+    }
 }
