@@ -1,6 +1,7 @@
 import React from 'react';
+import NextLink from 'next/link';
 import { Formik, Form } from 'formik';
-import { Box, Button, Heading, useToast } from '@chakra-ui/core';
+import { Box, Button, Flex, Heading, Link, useToast } from '@chakra-ui/core';
 import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
 import { useLoginMutation } from '../generated/graphql';
@@ -34,18 +35,17 @@ const Login: React.FC<{}> = ({ }) =>
             <Wrapper variant="small">
                 <Heading mb={5}>Login</Heading>
                 <Formik
-                    initialValues={{ username: "", password: "" }}
+                    initialValues={{ usernameOrEmail: "", password: "" }}
                     onSubmit={async (values) =>
                     {
-                        const response = await login({ options: values });
+                        const response = await login(values);
 
-                        if (values.username === "" || values.password === "")
+                        if (values.usernameOrEmail === "" || values.password === "")
                         {
                             showToast({ position: "top-right", title: "Login Failed", description: "Boss, fields can't be empty! ☹️", status: "error" });
                         } else if (response.data?.login.errors)
                         {
                             showToast({ position: "top-right", title: "Login Failed", description: "Oops!!!, Invalid Credentials 🕵️‍♂️", status: "error" });
-                            // setErrors(toErrorMap(response.data.login.errors));
                         } else if (response.data?.login.user)
                         {
                             await router.push("/");
@@ -55,10 +55,15 @@ const Login: React.FC<{}> = ({ }) =>
                     {({ isSubmitting }) => (
                         <>
                             <Form>
-                                <InputField name="username" placeholder="username" label="Username" noInputError={true} />
+                                <InputField name="usernameOrEmail" placeholder="username or email" label="Username or Email" noInputError={true} />
                                 <Box mt={4}>
                                     <InputField name="password" placeholder="password" label="Password" type="password" noInputError={true} />
                                 </Box>
+                                <Flex mt={2}>
+                                    <NextLink href="/forgot-password">
+                                        <Link ml="auto">Forgot password?</Link>
+                                    </NextLink>
+                                </Flex>
                                 <Button mt={4} type="submit" isLoading={isSubmitting} variantColor="teal">Login</Button>
                             </Form>
                         </>

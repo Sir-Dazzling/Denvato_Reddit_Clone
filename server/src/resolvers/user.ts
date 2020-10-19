@@ -3,11 +3,17 @@ import { MyContext } from "src/types";
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import argon2 from 'argon2';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { COOKIE_NAME } from "src/constants";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "src/constants";
+import { validateRegister } from "src/utils/validateRegister";
+import { sendEMail } from "src/utils/sendEmail";
+import { v4 } from "uuid";
 
 @InputType()
 class UsernamePasswordInput
 {
+    @Field()
+    email: string
+
     @Field()
     username: string
 
@@ -61,33 +67,22 @@ export class UserResolver
         @Ctx() { em, req }: MyContext,
     ): Promise<UserResponse>
     {
-        if (options.username.length <= 2)
+        const errors = validateRegister(options);
+        if (errors)
         {
-            return {
-                errors: [{
-                    field: "username",
-                    message: "username must be greater than 2"
-                }]
-            }
+            return { errors };
         }
 
-        if (options.password.length <= 3)
-        {
-            return {
-                errors: [{
-                    field: "password",
-                    message: "password must be greater than 3"
-                }]
-            }
-        }
         const hashedPassword = await argon2.hash(options.password);
         let user;
+
         try
         {
             const result = await (em as EntityManager).createQueryBuilder(User).getKnexQuery().insert(
                 {
                     username: options.username,
                     password: hashedPassword,
+                    email: options.email,
                     created_at: new Date(),
                     updated_at: new Date()
                 }
@@ -116,21 +111,23 @@ export class UserResolver
     // Login a user
     @Mutation(() => UserResponse)
     async login(
-        @Arg("options") options: UsernamePasswordInput,
+        @Arg("usernameOrEmail") usernameOrEmail: string,
+        @Arg("password") password: string,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse>
     {
-        const user = await em.findOne(User, { username: options.username })
+        const user = await em.findOne(User, usernameOrEmail.includes("@") ? { email: usernameOrEmail }
+            : { username: usernameOrEmail })
         if (!user)
         {
             return {
                 errors: [{
-                    field: "username",
+                    field: "usernameOrEmail",
                     message: "Invalid credentials"
                 }]
             }
         }
-        const valid = await argon2.verify(user.password, options.password);
+        const valid = await argon2.verify(user.password, password);
 
         if (!valid)
         {
@@ -163,5 +160,87 @@ export class UserResolver
             }
             resolve(true);
         }));
+    }
+
+    // Forgot password functionality
+    @Mutation(() => Boolean)
+    async forgotPassword(
+        @Arg("email") email: string,
+        @Ctx() { em, redis }: MyContext
+    ): Promise<boolean>
+    {
+        const user = await em.findOne(User, { email });
+
+        // checking if user is in database
+        if (!user)
+        {
+            return true;
+        }
+
+        const token = v4();
+        await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, "ex", 1000 * 60 * 60 * 24 * 3);
+
+        await sendEMail(email, `<a href='http://localhost:3000/change-password/${token}'>Reset Password</a>`);
+
+        return true;
+    }
+
+    // Changing user password logic
+    @Mutation(() => UserResponse)
+    async changePassword(
+        @Arg("token") token: string,
+        @Arg("newPassword") newPassword: string,
+        @Ctx() { redis, em, req }: MyContext
+    ): Promise<UserResponse>
+    {
+        if (newPassword.length <= 3)
+        {
+            return {
+                errors: [
+                    {
+                        field: "newPassword",
+                        message: "Length must be greater than 3"
+                    }
+                ]
+            };
+        }
+
+        const key = FORGET_PASSWORD_PREFIX + token;
+        const userId = await redis.get(key);
+        if (!userId)
+        {
+            return {
+                errors: [
+                    {
+                        field: "token",
+                        message: "token expired"
+                    }
+                ]
+            };
+        }
+
+        const user = await em.findOne(User, { id: parseInt(userId) });
+
+        if (!user)
+        {
+            return {
+                errors: [
+                    {
+                        field: "token",
+                        message: "user no longer exists"
+                    }
+                ]
+            };
+        }
+
+        user.password = await argon2.hash(newPassword);
+        await em.persistAndFlush(user);
+
+        redis.del(key);
+
+        // Login user after change password
+        req.session.userId = user.id;
+
+        return { user };
     }
 }
