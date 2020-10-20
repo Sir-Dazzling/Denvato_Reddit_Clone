@@ -81,7 +81,7 @@ let UserResolver = class UserResolver {
                 const result = yield typeorm_1.getConnection().createQueryBuilder().insert().into(User_1.User).values({
                     username: options.username,
                     password: hashedPassword,
-                    email: options.email,
+                    email: options.email
                 }).returning("*").execute();
                 user = result.raw[0];
             }

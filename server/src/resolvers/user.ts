@@ -65,11 +65,16 @@ export class UserResolver
 
         try
         {
+            // User.create({
+            //     username: options.username,
+            //     password: hashedPassword,
+            //     email: options.email
+            // }).save()
             const result = await getConnection().createQueryBuilder().insert().into(User).values(
                 {
                     username: options.username,
                     password: hashedPassword,
-                    email: options.email,
+                    email: options.email
                 }
             ).returning("*").execute();
 
