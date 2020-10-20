@@ -34,5 +34,6 @@ exports.validateRegister = (options) => {
             }
         ];
     }
+    return null;
 };
 //# sourceMappingURL=validateRegister.js.map
