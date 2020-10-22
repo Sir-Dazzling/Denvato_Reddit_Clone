@@ -1,14 +1,63 @@
+import { Arg, Ctx, Field, FieldResolver, InputType, Int, Mutation, ObjectType, Query, Resolver, Root, UseMiddleware } from "type-graphql";
+import { getConnection } from "typeorm";
 import { Post } from "../entities/Post";
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { isAuth } from "../middleware/isAuth";
+import { MyContext } from "../types";
 
-@Resolver()
+@InputType()
+class PostInput
+{
+    @Field()
+    title: string;
+
+    @Field()
+    text: string
+}
+
+@ObjectType()
+class PaginatedPosts
+{
+    @Field(() => [Post])
+    posts: Post[];
+
+    @Field()
+    hasMore: boolean
+}
+
+@Resolver(Post)
 export class PostResolver
 {
-    // Get all posts
-    @Query(() => [Post])
-    async posts(): Promise<Post[]>
+    @FieldResolver(() => String)
+    textSnippet(
+        @Root() root: Post
+    )
     {
-        return Post.find();
+        return root.text.slice(0, 50);
+    }
+
+    // Get all posts
+    @Query(() => PaginatedPosts)
+    async posts(
+        @Arg("limit", () => Int) limit: number,
+        @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+    ): Promise<PaginatedPosts>
+    {
+        const realLimit = Math.min(50, limit);
+        const realLimitPlusOne = realLimit + 1;
+        const qb = getConnection()
+            .getRepository(Post)
+            .createQueryBuilder("p")
+            .orderBy('"createdAt"', "DESC")
+            .take(realLimitPlusOne);
+
+        if (cursor)
+        {
+            qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) })
+        }
+
+        const posts = await qb.getMany();
+
+        return { posts: posts.slice(0, realLimit), hasMore: posts.length === realLimitPlusOne };
     }
 
     // Get a single post by id
@@ -20,13 +69,22 @@ export class PostResolver
 
     // Create a Post
     @Mutation(() => Post)
+    @UseMiddleware(isAuth)
     async createPost(
-        @Arg("title") title: String
+        @Arg("input") input: PostInput,
+        @Ctx() { req }: MyContext
     ): Promise<Post>
     {
-        //2 sql queries
-        return Post.create({ title }).save();
-    }
+        if (!req.session.userId)
+        {
+            throw new Error("Not authenticated");
+        }
+
+        return Post.create({
+            ...input,
+            creatorId: req.session.userId
+        }).save();
+    };
 
     // Update a Post
     @Mutation(() => Post, { nullable: true })

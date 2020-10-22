@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Flex, Heading } from '@chakra-ui/core';
+import { Box, Button, Flex, Heading, Icon, Input, InputGroup, InputLeftElement } from '@chakra-ui/core';
 import NextLink from 'next/link';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { isServer } from '../utils/isServer';
@@ -43,7 +43,10 @@ export const NavBar: React.FC<NavBarProps> = ({ }) =>
         // user is logged in
         body = (
             <Flex ml={"auto"}>
-                <Box>{data.me.username}</Box>
+                <NextLink href="/create-post">
+                    Create Post
+                </NextLink>
+                <Box ml={"2"}>{data.me.username}</Box>
                 <Button
                     variant="link"
                     color="white"
@@ -67,11 +70,21 @@ export const NavBar: React.FC<NavBarProps> = ({ }) =>
             wrap="wrap"
             padding="1.5rem"
             bg="cyan.800"
-            color="white">
+            color="white"
+            position="sticky"
+            top={0}
+            zIndex={2}>
             <Flex align="center" mr={5}>
                 <Heading as="h1" size="lg" letterSpacing={"-.1rem"}>
                     Denvato Reddit
                 </Heading>
+            </Flex>
+            <Flex ml="auto">
+                <InputGroup w="35vw">
+                    <InputLeftElement children={<Icon name="search" color="gray.500" />} />
+                    <Input isFullWidth={true} type="search" placeholder="Search here..." color="black" />
+                </InputGroup>
+
             </Flex>
             {body}
         </Flex>
