@@ -1,19 +1,11 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MockPosts1603341032595 = void 0;
-class MockPosts1603341032595 {
-    up(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class FakePosts1603374659751 implements MigrationInterface
+{
+
+    public async up(queryRunner: QueryRunner): Promise<void>
+    {
+        await queryRunner.query(`
         insert into post (title, text, "creatorId", "createdAt") values ('Forever Strong', 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.', 1, '2019-11-20T10:56:45Z');
         insert into post (title, text, "creatorId", "createdAt") values ('Respiro', 'In congue. Etiam justo. Etiam pretium iaculis justo.
         
@@ -330,12 +322,10 @@ class MockPosts1603341032595 {
         Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.', 1, '2019-12-30T03:01:49Z');
         
         `);
-        });
     }
-    down(_queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-        });
+
+    public async down(_queryRunner: QueryRunner): Promise<void>
+    {
     }
+
 }
-exports.MockPosts1603341032595 = MockPosts1603341032595;
-//# sourceMappingURL=1603341032595-MockPosts.js.map

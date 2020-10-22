@@ -9,7 +9,6 @@ interface NavBarProps { }
 export const NavBar: React.FC<NavBarProps> = ({ }) =>
 {
     const [show, setShow] = useState(false);
-    const handleToggle = () => setShow(!show);
     const [{ data, fetching }] = useMeQuery({
         pause: isServer()
     });

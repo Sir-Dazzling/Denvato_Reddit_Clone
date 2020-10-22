@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MockPosts1603341032595 = void 0;
-class MockPosts1603341032595 {
+exports.FakePosts1603374659751 = void 0;
+class FakePosts1603374659751 {
     up(queryRunner) {
         return __awaiter(this, void 0, void 0, function* () {
             yield queryRunner.query(`
@@ -337,5 +337,5 @@ class MockPosts1603341032595 {
         });
     }
 }
-exports.MockPosts1603341032595 = MockPosts1603341032595;
-//# sourceMappingURL=1603341032595-MockPosts.js.map
+exports.FakePosts1603374659751 = FakePosts1603374659751;
+//# sourceMappingURL=1603374659751-FakePosts.js.map

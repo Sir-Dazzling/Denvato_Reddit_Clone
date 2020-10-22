@@ -39,23 +39,57 @@ export class PostResolver
     @Query(() => PaginatedPosts)
     async posts(
         @Arg("limit", () => Int) limit: number,
-        @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+        @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
+        @Ctx() { req }: MyContext
     ): Promise<PaginatedPosts>
     {
         const realLimit = Math.min(50, limit);
         const realLimitPlusOne = realLimit + 1;
-        const qb = getConnection()
-            .getRepository(Post)
-            .createQueryBuilder("p")
-            .orderBy('"createdAt"', "DESC")
-            .take(realLimitPlusOne);
 
-        if (cursor)
+        const replacements: any[] = [realLimitPlusOne];
+
+        if (req.session.userId)
         {
-            qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) })
+            replacements.push(req.session.userId);
         }
 
-        const posts = await qb.getMany();
+        let cursorIndex = 3;
+        if (cursor)
+        {
+            replacements.push(new Date(parseInt(cursor)));
+            cursorIndex = replacements.length;
+        }
+
+        const posts = await getConnection().query(`
+            select p.*,
+            json_build_object(
+                'id', u.id,
+                'username', u.username,
+                'email', u.email,
+                'createdAt', u."createdAt",
+                'updatedAt', u."updatedAt"
+            ) creator,
+            ${req.session.userId ? '(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"' : 'null as "voteStatus"'}
+            from post p
+            inner join public.user u on u.id = p."creatorId"
+            ${cursor ? `where p."createdAt" < $${cursorIndex}` : ""}
+            order by p."createdAt" DESC
+            limit $1
+        `, replacements);
+
+        // const qb = getConnection()
+        //     .getRepository(Post)
+        //     .createQueryBuilder("p")
+        //     .innerJoinAndSelect("p.creator", 'u", "u.id = p."creatorId')
+        //     .orderBy('p."createdAt"', "DESC")
+        //     .take(realLimitPlusOne);
+
+        // if (cursor)
+        // {
+        //     qb.where('p."createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) })
+        // }
+
+        // const posts = await qb.getMany();
 
         return { posts: posts.slice(0, realLimit), hasMore: posts.length === realLimitPlusOne };
     }
